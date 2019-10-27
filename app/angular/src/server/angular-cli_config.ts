@@ -68,7 +68,10 @@ export function getLeadingAngularCliProject(ngCliConfig: any) {
   return projects.storybook || fallbackProject || firstProject;
 }
 
-export function getAngularCliWebpackConfigOptions(dirToSearch: Path) {
+export function getAngularCliWebpackConfigOptions(
+  dirToSearch: Path,
+  options: { configDir: string }
+) {
   const project = getLeadingAngularCliProject(getAngularCliConfig(dirToSearch));
   const { options: projectOptions } = project.architect.build;
 
@@ -79,7 +82,12 @@ export function getAngularCliWebpackConfigOptions(dirToSearch: Path) {
   );
 
   const projectRoot = path.resolve(dirToSearch, project.root);
-  const tsConfigPath = path.resolve(dirToSearch, projectOptions.tsConfig) as Path;
+  const projectTsConfigPath = path.resolve(dirToSearch, projectOptions.tsConfig) as Path;
+
+  const configRoot = path.resolve(dirToSearch, options.configDir);
+  const configTsConfigPath = path.resolve(configRoot, 'tsconfig.json') as Path;
+
+  const tsConfigPath = fs.existsSync(configTsConfigPath) ? configTsConfigPath : projectTsConfigPath;
   const tsConfig = getTsConfigOptions(tsConfigPath);
 
   return {
@@ -145,7 +153,7 @@ export function applyAngularCliWebpackConfig(baseConfig: any, cliWebpackConfigOp
     ),
     plugins: [
       new TsconfigPathsPlugin({
-        configFile: cliWebpackConfigOptions.buildOptions.tsConfig,
+        configFile: cliWebpackConfigOptions.tsConfigPath,
         // After ng build my-lib the default value of 'main' in the package.json is 'umd'
         // This causes that you cannot import components directly from dist
         // https://github.com/angular/angular-cli/blob/9f114aee1e009c3580784dd3bb7299bdf4a5918c/packages/angular_devkit/build_angular/src/angular-cli-files/models/webpack-configs/browser.ts#L68
