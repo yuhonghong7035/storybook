@@ -56,7 +56,7 @@ export class PostmsgTransport {
    */
   send(event: ChannelEvent, options?: any): Promise<any> {
     const frames = this.getFrames();
-    if (!frames.length) {
+    if (!frames.length || this.buffer.length) {
       return new Promise((resolve, reject) => {
         this.buffer.push({ event, resolve, reject });
       });
