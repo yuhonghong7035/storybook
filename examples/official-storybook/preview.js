@@ -5,6 +5,7 @@ import { withCssResources } from '@storybook/addon-cssresources';
 import { withA11y } from '@storybook/addon-a11y';
 import { withNotes } from '@storybook/addon-notes';
 import { DocsPage } from '@storybook/addon-docs/blocks';
+import { HelmetProvider } from 'react-helmet-async';
 
 import addHeadWarning from './head-warning';
 
@@ -30,10 +31,12 @@ addDecorator(withA11y);
 addDecorator(withNotes);
 
 addDecorator(storyFn => (
-  <ThemeProvider theme={convert(themes.light)}>
-    <Global styles={createReset} />
-    {storyFn()}
-  </ThemeProvider>
+  <HelmetProvider>
+    <ThemeProvider theme={convert(themes.light)}>
+      <Global styles={createReset} />
+      {storyFn()}
+    </ThemeProvider>
+  </HelmetProvider>
 ));
 
 addParameters({
