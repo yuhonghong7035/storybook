@@ -221,8 +221,6 @@ class ManagerProvider extends Component<Props, State> {
             }
           });
         }
-      } else {
-        console.log('no refs loaded');
       }
 
       api.setStories(data.stories);
